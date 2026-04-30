@@ -1,17 +1,41 @@
-# midterm_project
+🛡️ 프로젝트명: 지갑수호 (Wallet Guard)
+📱 프로그램 개요
+"나보다 엄격한 타인의 시선으로 지갑을 지키다"
+지갑수호는 MZ세대의 절약 트렌드인 '거지방(오픈채팅방)'의 상호 소비 검열 문화를 앱 서비스로 구현한 프로젝트입니다. 충동구매 전 동네 유저들에게 구매 명분을 검토받고 투표를 통해 소비를 통제받는 시스템을 제공합니다. 당근마켓의 친근한 카드 UI를 벤치마킹하여 절약 활동이 하나의 즐거운 놀이와 커뮤니티 경험이 되도록 설계했습니다.
 
-A new Flutter project.
+✨ 주요 기능 설명
+🏠 홈 (소비 검열 리스트): 유저들이 올린 구매 고민(품목, 가격)을 확인하고 '승인' 또는 '기각' 투표를 던져 타인의 지출을 통제합니다.
 
-## Getting Started
+💬 동네생활 (커뮤니티): '거지방'처럼 서로의 무지출 챌린지 성공을 응원하거나 절약 꿀팁, 가계부 정보를 공유합니다.
 
-This project is a starting point for a Flutter application.
+📄 상세 보기: 게시글의 구체적인 구매 사유를 확인하고 '도움이 됐어요' 버튼으로 공감을 표시합니다.
 
-A few resources to get you started if this is your first Flutter project:
+📝 수호 요청/글쓰기: 소비 전 허락을 구하는 글이나 커뮤니티 소식을 카드 스타일의 UI를 통해 작성합니다.
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+👤 나의 수호 (마이페이지): 기각시킨 지수, 수호 온도 등 본인의 절약 기여도를 대시보드 형태로 확인합니다.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+🛠️ 본인이 구현한 부분
+Provider 상태 관리 시스템: ServiceProvider와 CommunityProvider를 통해 투표 수 및 게시글 데이터가 실시간으로 반영되는 로직을 구현했습니다.
+
+통합 디자인 시스템 구축: 연회색 배경(0xFFF2F3F6)과 흰색 라운드 카드를 전 영역에 적용하여 일관된 브랜드 아이덴티티를 확립했습니다.
+
+동적 리스트 및 상세 페이지 연동: ListView.builder를 활용한 필터링 리스트와 상세 페이지 간의 데이터 전달 로직을 설계했습니다.
+
+🤖 AI 활용 여부 및 활용 범위
+활용 여부: AI(Gemini) 적극 활용 (바이브 코딩)
+
+활용 범위:
+
+아키텍처 설계: 효율적인 데이터 관리를 위한 Provider 기반 폴더 구조 및 모델링 제안
+
+UI/UX 리팩토링: '당근마켓' 스타일의 카드 UI 및 카테고리 칩 컴포넌트 디자인 디벨롭
+
+로직 구현: 투표 기능 분리 및 상세 페이지 실시간 업데이트 로직 구현 도움
+
+🔗 클론 및 참고 URL
+원본 URL: (본인이 참고하거나 클론한 GitHub 주소가 있다면 명시, 없다면 "해당 없음")
+
+📄 라이센스
+MIT License
+
+📸 실행 화면 캡처
