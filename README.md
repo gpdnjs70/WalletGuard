@@ -39,14 +39,14 @@
 
 | 🏠 수호 요청 목록 | 📝 수호 요청 글쓰기 | 💬 동네생활 |
 | :---: | :---: | :---: |
-| ![수호요청목록](이미지주소1) | ![수호요청글쓰기](이미지주소2) | ![동네생활](이미지주소3) |
+| <img width="442" height="844" alt="Image" src="https://github.com/user-attachments/assets/cd7be386-bbd3-4e6e-b7ff-a331668d3128" /> | <img width="440" height="843" alt="Image" src="https://github.com/user-attachments/assets/73773c02-2ca9-4983-badc-834f42814d3b" /> | <img width="442" height="845" alt="Image" src="https://github.com/user-attachments/assets/db9a661d-f71a-436d-be9c-b6aeb03d9d95" /> |
 | **메인 홈 (투표 리스트)** | **지출 허락 요청 작성** | **절약 커뮤니티 리스트** |
 
 <br>
 
 | 📄 동네생활 상세 | ✍️ 동네생활 글쓰기 | 👤 나의 수호 |
 | :---: | :---: | :---: |
-| ![동네생활상세](이미지주소4) | ![동네생활글쓰기](이미지주소5) | ![나의수호](이미지주소6) |
+| <img width="442" height="848" alt="Image" src="https://github.com/user-attachments/assets/9380c1fd-fd90-4df3-ba7b-89319426b068" /> | <img width="441" height="840" alt="Image" src="https://github.com/user-attachments/assets/9195f97c-9706-4ff7-91b5-10b43bdc2d6b" /> | <img width="441" height="847" alt="Image" src="https://github.com/user-attachments/assets/f2abcc6d-5c6c-4edc-b6f7-4d23847893f8" /> |
 | **게시글 본문 및 공감** | **꿀팁/정보 공유 작성** | **마이페이지 (수호 온도)** |
 
 ---
