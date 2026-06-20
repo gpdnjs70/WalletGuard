@@ -1,17 +1,56 @@
-# midterm_project
+# 🛡️ Wallet Guard
+> **"나보다 엄격한 타인의 시선으로 지갑을 지키다"**
 
-A new Flutter project.
+---
 
-## Getting Started
+### 📱 프로그램 개요
+본 프로젝트는 MZ세대의 절약 트렌드인 '거지방(오픈채팅방)'의 상호 소비 검열 문화를 앱 서비스로 구현한 프로젝트입니다. 충동구매 전 동네 유저들에게 구매 명분을 검토받고 투표를 통해 소비를 통제받는 시스템을 제공합니다. **당근마켓**의 친근한 카드 UI를 벤치마킹하여 절약 활동이 하나의 즐거운 놀이와 커뮤니티 경험이 되도록 설계했습니다.
 
-This project is a starting point for a Flutter application.
+---
 
-A few resources to get you started if this is your first Flutter project:
+### ✨ 주요 기능
+| 기능 | 상세 설명 |
+| :--- | :--- |
+| **🏠 홈 (검열 리스트)** | 유저들이 올린 구매 고민에 대해 '승인' 또는 '기각' 투표를 던집니다. |
+| **💬 동네생활** | 무지출 챌린지 성공 인증 및 절약 꿀팁을 카테고리별로 공유합니다. |
+| **📄 상세 보기** | 게시글의 구체적인 사유를 확인하고 '도움이 됐어요'로 공감을 표시합니다. |
+| **📝 수호 요청** | 소비 전 허락을 구하는 글을 카드 스타일 UI로 작성합니다. |
+| **👤 나의 수호** | 기각시킨 지수, 수호 온도 등 본인의 절약 기여도를 대시보드로 확인합니다. |
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+---
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+### 🛠️ 기술적 구현 (본인이 구현한 부분)
+*   **Provider 상태 관리 시스템**: `ServiceProvider`와 `CommunityProvider`를 통해 투표 수 및 게시글 데이터의 실시간 동기화를 구현했습니다.
+*   **통합 디자인 시스템 구축**: 연회색 배경(`0xFFF2F3F6`)과 흰색 라운드 카드를 전 영역에 적용하여 일관된 브랜드 아이덴티티를 확립했습니다.
+*   **동적 리스트 및 상세 페이지 연동**: `ListView.builder`를 활용한 필터링 리스트와 상세 페이지 간의 데이터 전달 로직을 설계했습니다.
+
+---
+
+### 🤖 AI 활용 범위 (바이브코딩)
+본 프로젝트는 효율적인 개발을 위해 AI(Gemini)를 적극적으로 활용하였습니다.
+*   **아키텍처 설계**: 효율적인 데이터 관리를 위한 Provider 기반 폴더 구조 및 모델링 제안을 받았습니다.
+*   **UI/UX 리팩토링**: 당근마켓 스타일의 카드 UI 및 카테고리 칩 컴포넌트 디자인을 고도화했습니다.
+*   **로직 구현**: 투표 기능 분리 및 상세 페이지 실시간 업데이트 로직 구현에 도움을 받았습니다.
+
+---
+
+### 📸 실행 화면
+> **거지방의 소비 통제 문화를 당근마켓 UI로 풀어낸 Wallet Guard의 주요 화면입니다.**
+
+| 🏠 수호 요청 목록 | 📝 수호 요청 글쓰기 | 💬 동네생활 |
+| :---: | :---: | :---: |
+| <img width="442" height="844" alt="Image" src="https://github.com/user-attachments/assets/cd7be386-bbd3-4e6e-b7ff-a331668d3128" /> | <img width="440" height="843" alt="Image" src="https://github.com/user-attachments/assets/73773c02-2ca9-4983-badc-834f42814d3b" /> | <img width="442" height="845" alt="Image" src="https://github.com/user-attachments/assets/db9a661d-f71a-436d-be9c-b6aeb03d9d95" /> |
+| **메인 홈 (투표 리스트)** | **지출 허락 요청 작성** | **절약 커뮤니티 리스트** |
+
+<br>
+
+| 📄 동네생활 상세 | ✍️ 동네생활 글쓰기 | 👤 나의 수호 |
+| :---: | :---: | :---: |
+| <img width="442" height="848" alt="Image" src="https://github.com/user-attachments/assets/9380c1fd-fd90-4df3-ba7b-89319426b068" /> | <img width="441" height="840" alt="Image" src="https://github.com/user-attachments/assets/9195f97c-9706-4ff7-91b5-10b43bdc2d6b" /> | <img width="441" height="847" alt="Image" src="https://github.com/user-attachments/assets/f2abcc6d-5c6c-4edc-b6f7-4d23847893f8" /> |
+| **게시글 본문 및 공감** | **꿀팁/정보 공유 작성** | **마이페이지 (수호 온도)** |
+
+---
+
+### 🔗 기타 정보
+*   **원본 URL**: 해당 없음
+*   **라이센스**: MIT License
