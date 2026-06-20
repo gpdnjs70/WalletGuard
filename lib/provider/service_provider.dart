@@ -1,54 +1,89 @@
-// lib/provider/service_provider.dart
+// service_provider.dart
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:midterm_project/models/guard_article.dart';
 
 class ServiceProvider extends ChangeNotifier {
-  // 실제 앱이라면 서버에서 받아올 데이터 리스트
-  List<GuardArticle> _articles = [
-    GuardArticle(id: "1", title: "아이패드 프로 사도 될까요?", town: "삼성동", price: 1200000, rejectCnt: 15, approveCnt: 2, content: "공부할 때 쓰려는데 너무 비싸네요.", time: "방금 전"),
-    GuardArticle(id: "2", title: "야식 족발 지를까요?", town: "논현동", price: 38000, rejectCnt: 40, approveCnt: 1, content: "배고픈데 참아야겠죠?", time: "5분 전"),
-  ];
-
+  List<GuardArticle> _articles = [];
   List<GuardArticle> get articles => _articles;
 
-  // 글쓰기 기능 (진짜로 리스트에 추가됨)
-  void addArticle(String title, String price, String content) {
-    final newArticle = GuardArticle(
-      id: DateTime.now().toString(),
-      title: title,
-      town: "삼성동", // 유저 정보에서 가져올 부분
-      price: int.parse(price),
-      rejectCnt: 0,
-      approveCnt: 0,
-      content: content,
-      time: "방금 전",
-    );
-    _articles.insert(0, newArticle);
-    notifyListeners();
+  final FirebaseFirestore _db = FirebaseFirestore.instance;
+
+  ServiceProvider() {
+    _listenToArticles();
   }
 
-  // 투표 기능
-  void vote(String id, bool isApprove) {
-    // 리스트에서 해당 ID를 가진 게시글 찾기
-    int index = _articles.indexWhere((article) => article.id == id);
+  // Firestore의 데이터를 실시간으로 수신
+  void _listenToArticles() {
+    _db.collection('guard_articles')
+        .orderBy('createdAt', descending: true) // 최신 글이 위로 오도록 정렬
+        .snapshots()
+        .listen((snapshot) {
+      _articles = snapshot.docs.map((doc) => GuardArticle.fromFirestore(doc)).toList();
+      notifyListeners();
+    });
+  }
 
-    if (index != -1) {
-      GuardArticle old = _articles[index];
-
-      // 기존 데이터를 바탕으로 숫자가 업데이트된 새 객체 생성 (데이터 불변성 유지)
-      _articles[index] = GuardArticle(
-        id: old.id,
-        title: old.title,
-        town: old.town,
-        price: old.price,
-        content: old.content,
-        time: old.time,
-        rejectCnt: isApprove ? old.rejectCnt : old.rejectCnt + 1,
-        approveCnt: isApprove ? old.approveCnt + 1 : old.approveCnt,
-      );
-
-      notifyListeners(); // 중요: 이걸 호출해야 HomeView의 Consumer가 반응함
+  // 글쓰기 기능 (Firestore에 저장)
+  Future<void> addArticle(String title, String price, String content) async {
+    try {
+      await _db.collection('guard_articles').add({
+        'title': title,
+        'town': "삼성동",
+        'price': int.parse(price),
+        'rejectCnt': 0,
+        'approveCnt': 0,
+        'content': content,
+        'time': "방금 전",
+        'createdAt': FieldValue.serverTimestamp(),
+        'user': '지갑수호대장', // 👈 이 필드가 꼭 있어야 합니다.
+      });
+      print("Firestore 데이터 저장 성공!"); // 👈 콘솔 확인용
+    } catch (e) {
+      print("저장 실패: $e"); // 👈 에러 발생 시 여기로 뜹니다.
     }
+  }
+
+  // 투표 기능 (Firestore 문서 업데이트)
+  Future<void> vote(String id, bool isApprove) async {
+    final docRef = _db.collection('guard_articles').doc(id);
+
+    if (isApprove) {
+      await docRef.update({'approveCnt': FieldValue.increment(1)});
+    } else {
+      await docRef.update({'rejectCnt': FieldValue.increment(1)});
+    }
+  }
+
+  // 1. 특정 게시글의 실시간 댓글 스트림(Stream) 가져오기
+  Stream<QuerySnapshot> getCommentsStream(String articleId) {
+    return _db
+        .collection('guard_articles')
+        .doc(articleId)
+        .collection('comments')
+        .orderBy('createdAt', descending: false) // 오래된 댓글이 위로 오도록 정렬
+        .snapshots();
+  }
+
+  // 2. 특정 게시글에 댓글 작성하기
+  Future<void> addComment(String articleId, String content) async {
+    await _db
+        .collection('guard_articles')
+        .doc(articleId)
+        .collection('comments')
+        .add({
+      'user': '지갑수호대장', // 나중에는 실제 유저명으로 변경
+      'content': content,
+      'createdAt': FieldValue.serverTimestamp(),
+    });
+  }
+
+  // 내 심판 내역(수호 요청) 스트림
+  Stream<QuerySnapshot> getMyArticlesStream() {
+    return _db.collection('guard_articles')
+        .where('user', isEqualTo: '지갑수호대장') // 실제 로그인된 유저명 사용
+        .orderBy('createdAt', descending: true)
+        .snapshots();
   }
 }
 

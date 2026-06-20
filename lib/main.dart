@@ -1,18 +1,43 @@
+// main.dart
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:midterm_project/App.dart';
 import 'package:midterm_project/provider/service_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:midterm_project/provider/community_provider.dart';
+import 'package:firebase_core/firebase_core.dart';
 
-void main() {
-  runApp(MultiProvider(
-    providers: [
-      ChangeNotifierProvider(create: (_) => NavigationProvider()),
-      ChangeNotifierProvider(create: (_) => ServiceProvider()),
-      ChangeNotifierProvider(create: (_) => CommunityProvider()),
-    ],
-    child: const WalletGuardApp(),
-  ));
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // 실행 환경이 웹(크롬)인지 확인합니다.
+  if (kIsWeb) {
+    // 웹 환경: Firebase 콘솔에서 복사한 값을 여기에 붙여넣습니다.
+    await Firebase.initializeApp(
+      options: const FirebaseOptions(
+          apiKey: "AIzaSyB4lulE5jY1ycYO7b3icE57pVztBsmzc8E",
+          authDomain: "wallet-guard-5154b.firebaseapp.com",
+          projectId: "wallet-guard-5154b",
+          storageBucket: "wallet-guard-5154b.firebasestorage.app",
+          messagingSenderId: "588879967074",
+          appId: "1:588879967074:web:a03a0f8c9322005c5eb23b"
+      ),
+    );
+  } else {
+    // 안드로이드 환경: 기존처럼 google-services.json을 읽도록 합니다.
+    await Firebase.initializeApp();
+  }
+
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => NavigationProvider()),
+        ChangeNotifierProvider(create: (_) => ServiceProvider()),
+        ChangeNotifierProvider(create: (_) => CommunityProvider()),
+      ],
+      child: const WalletGuardApp(),
+    ),
+  );
 }
 
 class WalletGuardApp extends StatelessWidget {
@@ -24,11 +49,22 @@ class WalletGuardApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,
-        // 레퍼런스 사진의 밝고 선명한 노란색 적용
         colorSchemeSeed: const Color(0xFFFFD541),
         scaffoldBackgroundColor: const Color(0xFFFFD541),
       ),
-      home: const MainNavigationPage(),
+      // builder를 사용하여 모든 화면을 비율로 감쌉니다.
+      builder: (context, child) {
+        return Scaffold(
+          backgroundColor: Colors.black,
+          body: Center(
+            child: AspectRatio(
+              aspectRatio: 9 / 16, // 세로형 비율
+              child: child, // 여기에 실제 앱 화면들이 들어갑니다.
+            ),
+          ),
+        );
+      },
+      home: const SplashScreen(),
     );
   }
 }
@@ -69,12 +105,14 @@ class _AddArticleViewState extends State<AddArticleView> {
             padding: const EdgeInsets.only(right: 16.0),
             child: ElevatedButton(
               onPressed: () {
+                print("완료 버튼 클릭됨!");
                 if (_titleController.text.isNotEmpty && _priceController.text.isNotEmpty) {
                   Provider.of<ServiceProvider>(context, listen: false).addArticle(
                     _titleController.text,
                     _priceController.text,
                     _contentController.text,
                   );
+                  print("addArticle 함수 호출됨!");
                   Navigator.pop(context);
                 }
               },
@@ -100,12 +138,12 @@ class _AddArticleViewState extends State<AddArticleView> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "소중한 자산을 위한",
+                  "텅장을 지키기 위한",
                   style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: darkText.withOpacity(0.6)),
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  "수호 요청 작성",
+                  "탕진 심판 신청",
                   style: TextStyle(fontSize: 28, fontWeight: FontWeight.w900, color: darkText, letterSpacing: -1.0),
                 ),
               ],
@@ -145,18 +183,18 @@ class _AddArticleViewState extends State<AddArticleView> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            _buildSectionLabel("무엇을 수호할까요?"),
+                            _buildSectionLabel("무엇을 구매하실 건가요?"),
                             TextField(
                               controller: _titleController,
                               cursorColor: brandYellow,
                               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: darkText),
-                              decoration: _buildInputDecoration("수호 제목 입력"),
+                              decoration: _buildInputDecoration("구매 예정 물품 입력"),
                             ),
                             const Padding(
                               padding: EdgeInsets.symmetric(vertical: 16),
                               child: Divider(color: Color(0xFFF1F5F9), thickness: 1.5),
                             ),
-                            _buildSectionLabel("예상 수호 금액"),
+                            _buildSectionLabel("예상 탕진 금액"),
                             Row(
                               children: [
                                 // ₩ 기호 색상을 검은색(darkText)으로 변경
@@ -181,14 +219,14 @@ class _AddArticleViewState extends State<AddArticleView> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            _buildSectionLabel("수호가 필요한 상세 이유"),
+                            _buildSectionLabel("고민되는 이유를 적어주세요"),
                             const SizedBox(height: 12),
                             TextField(
                               controller: _contentController,
                               maxLines: 8,
                               cursorColor: brandYellow,
                               style: TextStyle(fontSize: 16, height: 1.6, color: darkText.withOpacity(0.8)),
-                              decoration: _buildInputDecoration("수호대원들에게 상황을 설명해주세요."),
+                              decoration: _buildInputDecoration("왜 사고 싶은지, 왜 참아야 하는지 적어주세요."),
                             ),
                           ],
                         ),

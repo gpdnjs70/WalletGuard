@@ -1,9 +1,12 @@
+// App.dart
 import 'package:flutter/material.dart';
 import 'package:midterm_project/provider/service_provider.dart';
 import 'package:midterm_project/main.dart';
 import 'package:provider/provider.dart';
 import 'package:midterm_project/models/community_post.dart';
 import 'package:midterm_project/provider/community_provider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:midterm_project/models/guard_article.dart';
 
 // 공통 디자인 상수
 const Color brandYellow = Color(0xFFFFD541);
@@ -45,9 +48,9 @@ class MainNavigationPage extends StatelessWidget {
           backgroundColor: Colors.white,
           selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
           items: const [
-            BottomNavigationBarItem(icon: Icon(Icons.shield_outlined), activeIcon: Icon(Icons.shield), label: '수호'),
-            BottomNavigationBarItem(icon: Icon(Icons.chat_bubble_outline), activeIcon: Icon(Icons.chat_bubble), label: '동네생활'),
-            BottomNavigationBarItem(icon: Icon(Icons.person_outline), activeIcon: Icon(Icons.person), label: '나의 수호'),
+            BottomNavigationBarItem(icon: Icon(Icons.shield_outlined), activeIcon: Icon(Icons.shield), label: '심판대'),
+            BottomNavigationBarItem(icon: Icon(Icons.chat_bubble_outline), activeIcon: Icon(Icons.chat_bubble), label: '수다방'),
+            BottomNavigationBarItem(icon: Icon(Icons.person_outline), activeIcon: Icon(Icons.person), label: '소비 기록'),
           ],
         ),
       ),
@@ -77,20 +80,21 @@ class HomeView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        _buildHeader("함께 지키는", "수호 요청 목록"),
+        _buildHeader("텅장 방어", "오늘의 심판대"),
         Expanded(
           child: _buildWhiteContainer(
             child: Consumer<ServiceProvider>(
               builder: (context, service, child) {
                 if (service.articles.isEmpty) {
-                  return const Center(child: Text("등록된 수호 요청이 없습니다."));
+                  return const Center(child: Text("등록된 심판 목록이 없습니다."));
                 }
                 return ListView.builder(
                   padding: const EdgeInsets.all(24),
                   itemCount: service.articles.length,
                   itemBuilder: (context, index) {
                     final item = service.articles[index];
-                    return _buildServiceCard(item, service);
+                    // _buildServiceCard에 context를 추가로 넘겨줍니다.
+                    return _buildServiceCard(item, service, context);
                   },
                 );
               },
@@ -101,43 +105,41 @@ class HomeView extends StatelessWidget {
     );
   }
 
-  Widget _buildServiceCard(item, service) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 20),
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 10, offset: const Offset(0, 4))],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(item.town, style: TextStyle(color: darkText.withOpacity(0.4), fontSize: 12, fontWeight: FontWeight.bold)),
-              Text(item.time, style: TextStyle(color: darkText.withOpacity(0.3), fontSize: 11)),
-            ],
+  Widget _buildServiceCard(item, service, BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => GuardArticleDetailView(article: item),
           ),
-          const SizedBox(height: 8),
-          Text(item.title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: darkText)),
-          const SizedBox(height: 4),
-          Text("₩${item.price}", style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: accentRed)),
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: 12),
-            child: Divider(color: softGray, thickness: 2),
-          ),
-          Text(item.content, style: TextStyle(fontSize: 14, color: darkText.withOpacity(0.7), height: 1.5)),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(child: _buildVoteBtn(Icons.close_rounded, "기각", item.rejectCnt, Colors.grey, () => service.vote(item.id, false))),
-              const SizedBox(width: 10),
-              Expanded(child: _buildVoteBtn(Icons.check_rounded, "승인", item.approveCnt, brandYellow, () => service.vote(item.id, true))),
-            ],
-          ),
-        ],
+        );
+      },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 20),
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(24),
+          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 10, offset: const Offset(0, 4))],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 8),
+            Text(item.title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: darkText)),
+            const SizedBox(height: 4),
+            Text("₩${item.price}", style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: accentRed)),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(child: _buildVoteBtn(Icons.close_rounded, "참아라", item.rejectCnt, Colors.grey, () => service.vote(item.id, false))),
+                const SizedBox(width: 10),
+                Expanded(child: _buildVoteBtn(Icons.check_rounded, "사라", item.approveCnt, brandYellow, () => service.vote(item.id, true))),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -179,7 +181,7 @@ class _CommunityViewState extends State<CommunityView> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        _buildHeader("따뜻한 소통", "동네생활"),
+        _buildHeader("거지들의 수다", "정보 공유"),
         Expanded(
           child: _buildWhiteContainer(
             child: Consumer<CommunityProvider>(
@@ -190,11 +192,13 @@ class _CommunityViewState extends State<CommunityView> {
 
                 return Column(
                   children: [
-                    SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
+                    // 👈 SingleChildScrollView + Row 대신 Wrap 사용
+                    Padding(
                       padding: const EdgeInsets.fromLTRB(24, 24, 24, 12),
-                      child: Row(
-                        children: ["전체", "절약꿀팁", "동네질문", "가계부공유", "수호성공"]
+                      child: Wrap(
+                        spacing: 8, // 칩 사이 가로 간격
+                        runSpacing: 8, // 줄바꿈 시 세로 간격
+                        children: ["전체", "절약꿀팁", "동네질문", "가계부공유", "방어성공"]
                             .map((label) => _categoryChip(label))
                             .toList(),
                       ),
@@ -286,7 +290,7 @@ class MyCarrotView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        _buildHeader("나의 활동", "마이 수호"),
+        _buildHeader("나의 지출", "소비 기록"),
         Expanded(
           child: _buildWhiteContainer(
             child: SingleChildScrollView(
@@ -297,12 +301,16 @@ class MyCarrotView extends StatelessWidget {
                   const SizedBox(height: 20),
                   _buildStatRow(),
                   const SizedBox(height: 30),
-                  _buildMenuCard(Icons.history_rounded, "나의 수호 요청 히스토리"),
-                  _buildMenuCard(Icons.edit_note_rounded, "내가 쓴 동네생활 글"),
-                  _buildMenuCard(Icons.favorite_rounded, "관심 있는 절약 정보"),
+                  _buildMenuCard(Icons.history_rounded, "심판 내역", () {
+                    Navigator.push(context, MaterialPageRoute(builder: (_) => const MyListScreen(type: 'article')));
+                  }),
+                  _buildMenuCard(Icons.edit_note_rounded, "내가 쓴 글", () {
+                    Navigator.push(context, MaterialPageRoute(builder: (_) => const MyListScreen(type: 'post')));
+                  }),
+                  _buildMenuCard(Icons.favorite_rounded, "관심 있는 절약 정보", () {}),
                   const Divider(height: 40, color: softGray, thickness: 2),
-                  _buildMenuCard(Icons.notifications_none_rounded, "공지사항"),
-                  _buildMenuCard(Icons.help_outline_rounded, "자주 묻는 질문"),
+                  _buildMenuCard(Icons.notifications_none_rounded, "공지사항", () {}),
+                  _buildMenuCard(Icons.help_outline_rounded, "자주 묻는 질문", () {}),
                 ],
               ),
             ),
@@ -344,9 +352,9 @@ class MyCarrotView extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _statItem("기각시킨 지름", "12건", accentRed),
-          _statItem("수호한 금액", "34만원", Colors.green),
-          _statItem("수호 온도", "37.5℃", brandYellow),
+          _statItem("참아낸 지출", "12건", accentRed),
+          _statItem("텅장 방어액", "34만원", Colors.green),
+          _statItem("절약 온도", "37.5℃", brandYellow),
         ],
       ),
     );
@@ -362,7 +370,7 @@ class MyCarrotView extends StatelessWidget {
     );
   }
 
-  Widget _buildMenuCard(IconData icon, String title) {
+  Widget _buildMenuCard(IconData icon, String title, VoidCallback onTap) {
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 4),
       leading: Container(
@@ -372,7 +380,7 @@ class MyCarrotView extends StatelessWidget {
       ),
       title: Text(title, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: darkText)),
       trailing: const Icon(Icons.chevron_right_rounded, color: Color(0xFFADB5BD)),
-      onTap: () {},
+      onTap: onTap, // 👈 추가된 onTap 연결
     );
   }
 }
@@ -422,7 +430,7 @@ class _AddCommunityPostViewState extends State<AddCommunityPostView> {
       ),
       body: Column(
         children: [
-          _buildHeader("소중한 의견", "생활 글쓰기"),
+          _buildHeader("거지들의 수다", "글쓰기"),
           Expanded(
             child: _buildWhiteContainer(
               child: SingleChildScrollView(
@@ -439,13 +447,17 @@ class _AddCommunityPostViewState extends State<AddCommunityPostView> {
                             isExpanded: true,
                             underline: const SizedBox(),
                             icon: const Icon(Icons.keyboard_arrow_down_rounded),
-                            items: ["절약꿀팁", "동네질문", "가계부공유", "수호성공"].map((s) => DropdownMenuItem(value: s, child: Text(s, style: const TextStyle(fontWeight: FontWeight.bold)))).toList(),
+                            items: ["절약꿀팁", "동네질문", "가계부공유", "방어성공"].map((s) => DropdownMenuItem(value: s, child: Text(s, style: const TextStyle(fontWeight: FontWeight.bold)))).toList(),
                             onChanged: (v) => setState(() => selectedTag = v!),
                           ),
                           const Divider(color: softGray),
                           TextField(
                             controller: _titleController,
-                            decoration: const InputDecoration(hintText: "제목을 입력하세요", border: InputBorder.none),
+                            decoration: InputDecoration(
+                              hintText: "제목을 입력하세요",
+                              hintStyle: TextStyle(color: darkText.withOpacity(0.3)),
+                              border: InputBorder.none,
+                            ),
                             style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                           ),
                         ],
@@ -456,7 +468,11 @@ class _AddCommunityPostViewState extends State<AddCommunityPostView> {
                       child: TextField(
                         controller: _contentController,
                         maxLines: 10,
-                        decoration: const InputDecoration(hintText: "동네 분들과 나누고 싶은 이야기를 적어주세요.", border: InputBorder.none),
+                        decoration: InputDecoration(
+                          hintText: "어떻게 방어했는지, 혹은 무엇이 궁금한지 적어주세요.",
+                          hintStyle: TextStyle(color: darkText.withOpacity(0.3)),
+                          border: InputBorder.none,
+                        ),
                       ),
                     ),
                   ],
@@ -514,65 +530,484 @@ Widget _buildInputCard({required Widget child}) {
   );
 }
 
-class CommunityDetailView extends StatelessWidget {
+class CommunityDetailView extends StatefulWidget {
   final CommunityPost post;
   const CommunityDetailView({super.key, required this.post});
+
+  @override
+  State<CommunityDetailView> createState() => _CommunityDetailViewState();
+}
+
+class _CommunityDetailViewState extends State<CommunityDetailView> {
+  final TextEditingController _commentController = TextEditingController();
+
+  @override
+  void dispose() {
+    _commentController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Consumer<CommunityProvider>(
       builder: (context, provider, child) {
-        final currentPost = provider.posts.firstWhere((p) => p.id == post.id);
+        // 현재 화면에 띄울 게시글의 최신 상태(추천수)를 가져옵니다.
+        final currentPost = provider.posts.firstWhere(
+              (p) => p.id == widget.post.id,
+          orElse: () => widget.post,
+        );
+
         return Scaffold(
           backgroundColor: brandYellow,
           appBar: AppBar(
             backgroundColor: Colors.transparent,
             elevation: 0,
             iconTheme: const IconThemeData(color: darkText),
-            // AppBar 높이 조절이나 Leading 아이콘 정렬을 위한 설정 가능
           ),
           body: Column(
             children: [
               _buildHeader(currentPost.tag, "동네생활 상세"),
               Expanded(
                 child: _buildWhiteContainer(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.all(28),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(currentPost.title, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: darkText)),
-                        const SizedBox(height: 8),
-                        Text("${currentPost.user} · ${currentPost.town} · ${currentPost.time}", style: TextStyle(color: darkText.withOpacity(0.4), fontSize: 13)),
-                        const Divider(height: 40, color: Color(0xFFEEEEEE)),
-                        Text(currentPost.content, style: const TextStyle(fontSize: 16, height: 1.7, color: darkText)),
-                        const SizedBox(height: 40),
-                        Center(
-                          child: InkWell(
-                            onTap: () => provider.likePost(currentPost.id),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                              decoration: BoxDecoration(color: brandYellow, borderRadius: BorderRadius.circular(30)),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  const Icon(Icons.thumb_up_rounded, size: 18, color: darkText),
-                                  const SizedBox(width: 8),
-                                  Text("도움이 됐어요 ${currentPost.likes}", style: const TextStyle(fontWeight: FontWeight.bold, color: darkText)),
-                                ],
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      // 1. 본문 및 공감 버튼 영역
+                      Container(
+                        color: Colors.white,
+                        padding: const EdgeInsets.all(28),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(currentPost.title, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: darkText)),
+                            const SizedBox(height: 8),
+                            Text("${currentPost.user} · ${currentPost.town} · ${currentPost.time}", style: TextStyle(color: darkText.withOpacity(0.4), fontSize: 13)),
+                            const Divider(height: 40, color: Color(0xFFEEEEEE)),
+                            Text(currentPost.content, style: const TextStyle(fontSize: 16, height: 1.7, color: darkText)),
+                            const SizedBox(height: 40),
+
+                            // 공감(추천) 버튼
+                            Center(
+                              child: InkWell(
+                                onTap: () => provider.likePost(currentPost.id),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                                  decoration: BoxDecoration(color: brandYellow, borderRadius: BorderRadius.circular(30)),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      const Icon(Icons.thumb_up_rounded, size: 18, color: darkText),
+                                      const SizedBox(width: 8),
+                                      Text("도움이 됐어요 ${currentPost.likes}", style: const TextStyle(fontWeight: FontWeight.bold, color: darkText)),
+                                    ],
+                                  ),
+                                ),
                               ),
                             ),
-                          ),
+                          ],
                         ),
-                      ],
-                    ),
+                      ),
+
+                      // 2. 게시글과 댓글을 나누는 굵은 구분선
+                      const Divider(color: softGray, thickness: 8, height: 8),
+
+                      // 3. 실시간 댓글 영역 (StreamBuilder)
+                      Expanded(
+                        child: StreamBuilder<QuerySnapshot>(
+                          stream: provider.getCommentsStream(widget.post.id),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              return const Center(child: CircularProgressIndicator(color: brandYellow));
+                            }
+                            if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                              return Center(
+                                child: Text("가장 먼저 댓글을 남겨보세요!", style: TextStyle(color: darkText.withOpacity(0.5))),
+                              );
+                            }
+
+                            final comments = snapshot.data!.docs;
+                            return ListView.separated(
+                              padding: const EdgeInsets.all(24),
+                              itemCount: comments.length,
+                              separatorBuilder: (_, __) => const SizedBox(height: 20),
+                              itemBuilder: (context, index) {
+                                var data = comments[index].data() as Map<String, dynamic>;
+                                return Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const CircleAvatar(
+                                      radius: 18,
+                                      backgroundColor: brandYellow,
+                                      child: Icon(Icons.person_rounded, size: 22, color: Colors.white),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(data['user'] ?? '동네 이웃', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: darkText)),
+                                          const SizedBox(height: 6),
+                                          Text(data['content'] ?? '', style: TextStyle(fontSize: 15, color: darkText.withOpacity(0.8), height: 1.4)),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          },
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
+
+              // 4. 댓글 입력창 (키보드 대응)
+              Container(
+                color: Colors.white,
+                padding: EdgeInsets.only(
+                  left: 20, right: 20, top: 12,
+                  bottom: MediaQuery.of(context).viewInsets.bottom + 20, // 키보드 높이만큼 패딩
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: _commentController,
+                        decoration: InputDecoration(
+                          hintText: "댓글을 입력해주세요...",
+                          hintStyle: TextStyle(color: darkText.withOpacity(0.3), fontSize: 14),
+                          filled: true,
+                          fillColor: softGray,
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(20), borderSide: BorderSide.none),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    InkWell(
+                      onTap: () {
+                        if (_commentController.text.isNotEmpty) {
+                          provider.addComment(widget.post.id, _commentController.text);
+                          _commentController.clear();
+                        }
+                      },
+                      child: const CircleAvatar(
+                        radius: 22,
+                        backgroundColor: darkText,
+                        child: Icon(Icons.send_rounded, color: Colors.white, size: 20),
+                      ),
+                    ),
+                  ],
+                ),
+              )
             ],
           ),
         );
       },
+    );
+  }
+}
+
+class GuardArticleDetailView extends StatefulWidget {
+  final GuardArticle article;
+  const GuardArticleDetailView({super.key, required this.article});
+
+  @override
+  State<GuardArticleDetailView> createState() => _GuardArticleDetailViewState();
+}
+
+class _GuardArticleDetailViewState extends State<GuardArticleDetailView> {
+  final TextEditingController _commentController = TextEditingController();
+
+  @override
+  void dispose() {
+    _commentController.dispose();
+    super.dispose();
+  }
+
+  // 상세 페이지 전용 투표 버튼 디자인 (버튼이 더 잘 보이도록 스타일을 살짝 조절했습니다)
+  Widget _buildDetailVoteBtn(IconData icon, String label, int count, Color color, VoidCallback onTap) {
+    bool isYellow = color == brandYellow;
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 14),
+        decoration: BoxDecoration(
+          color: isYellow ? brandYellow : Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: isYellow ? null : Border.all(color: const Color(0xFFE2E8F0), width: 1.5),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, size: 20, color: darkText),
+            const SizedBox(width: 6),
+            Text("$label $count", style: const TextStyle(color: darkText, fontWeight: FontWeight.bold, fontSize: 15)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Consumer를 최상단에 배치하여 투표를 누를 때마다 화면의 숫자가 즉시 바뀌도록 합니다.
+    return Consumer<ServiceProvider>(
+      builder: (context, service, child) {
+        // 현재 화면에 띄울 게시글의 최신 상태(투표수)를 리스트에서 찾아옵니다.
+        final currentArticle = service.articles.firstWhere(
+              (a) => a.id == widget.article.id,
+          orElse: () => widget.article,
+        );
+
+        return Scaffold(
+          backgroundColor: brandYellow,
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            iconTheme: const IconThemeData(color: darkText),
+            title: const Text("심판대 상세", style: TextStyle(fontWeight: FontWeight.bold, color: darkText, fontSize: 18)),
+            centerTitle: true,
+          ),
+          body: Column(
+            children: [
+              Expanded(
+                child: _buildWhiteContainer(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      // 1. 원본 게시글 & 투표 버튼 영역 (배경을 흰색으로 분리)
+                      Container(
+                        color: Colors.white,
+                        padding: const EdgeInsets.all(28),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(currentArticle.title, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: darkText)),
+                            const SizedBox(height: 8),
+                            Text("₩${currentArticle.price}", style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: accentRed)),
+                            const SizedBox(height: 16),
+                            Text(currentArticle.content, style: TextStyle(fontSize: 15, color: darkText.withOpacity(0.8), height: 1.6)),
+                            const SizedBox(height: 30),
+
+                            // 투표 버튼 추가
+                            Row(
+                              children: [
+                                Expanded(child: _buildDetailVoteBtn(Icons.close_rounded, "참아라", currentArticle.rejectCnt, Colors.grey, () => service.vote(currentArticle.id, false))),
+                                const SizedBox(width: 12),
+                                Expanded(child: _buildDetailVoteBtn(Icons.check_rounded, "사라", currentArticle.approveCnt, brandYellow, () => service.vote(currentArticle.id, true))),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      // 2. 게시글과 댓글 영역을 나누는 굵은 구분선
+                      const Divider(color: softGray, thickness: 8, height: 8),
+
+                      // 3. 실시간 댓글 영역 (StreamBuilder)
+                      Expanded(
+                        child: StreamBuilder<QuerySnapshot>(
+                          stream: service.getCommentsStream(widget.article.id),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              return const Center(child: CircularProgressIndicator(color: brandYellow));
+                            }
+                            if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                              return Center(
+                                child: Text("가장 먼저 팩폭을 남겨보세요!", style: TextStyle(color: darkText.withOpacity(0.5))),
+                              );
+                            }
+
+                            final comments = snapshot.data!.docs;
+                            return ListView.separated(
+                              padding: const EdgeInsets.all(24),
+                              itemCount: comments.length,
+                              separatorBuilder: (_, __) => const SizedBox(height: 20),
+                              itemBuilder: (context, index) {
+                                var data = comments[index].data() as Map<String, dynamic>;
+                                return Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const CircleAvatar(
+                                      radius: 18,
+                                      backgroundColor: brandYellow,
+                                      child: Icon(Icons.person_rounded, size: 22, color: Colors.white),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(data['user'] ?? '익명 대원', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: darkText)),
+                                          const SizedBox(height: 6),
+                                          Text(data['content'] ?? '', style: TextStyle(fontSize: 15, color: darkText.withOpacity(0.8), height: 1.4)),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              // 4. 댓글 입력창 (키보드 대응)
+              Container(
+                color: Colors.white,
+                padding: EdgeInsets.only(
+                  left: 20, right: 20, top: 12,
+                  bottom: MediaQuery.of(context).viewInsets.bottom + 20, // 키보드 높이만큼 패딩 추가
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: _commentController,
+                        decoration: InputDecoration(
+                          hintText: "따끔한 조언을 남겨주세요.",
+                          hintStyle: TextStyle(color: darkText.withOpacity(0.3), fontSize: 14),
+                          filled: true,
+                          fillColor: softGray,
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(20), borderSide: BorderSide.none),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    InkWell(
+                      onTap: () {
+                        if (_commentController.text.isNotEmpty) {
+                          service.addComment(widget.article.id, _commentController.text);
+                          _commentController.clear();
+                        }
+                      },
+                      child: const CircleAvatar(
+                        radius: 22,
+                        backgroundColor: darkText,
+                        child: Icon(Icons.send_rounded, color: Colors.white, size: 20),
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class SplashScreen extends StatefulWidget {
+  const SplashScreen({super.key});
+
+  @override
+  State<SplashScreen> createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends State<SplashScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // 2초 대기 후 메인 화면(MainNavigationPage)으로 이동
+    Future.delayed(const Duration(seconds: 5), () {
+      // pushReplacement를 사용하여 뒤로가기 버튼을 눌러도 다시 스플래시로 돌아오지 않게 합니다.
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const MainNavigationPage()),
+      );
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: brandYellow, // 앱의 시그니처 컬러
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // 수호대장을 상징하는 거대한 방패 아이콘
+            const Icon(Icons.shield_rounded, size: 100, color: darkText),
+            const SizedBox(height: 20),
+            // 앱 타이틀
+            const Text(
+              "거지방",
+              style: TextStyle(
+                fontSize: 36,
+                fontWeight: FontWeight.w900,
+                color: darkText,
+                letterSpacing: -1.5,
+              ),
+            ),
+            const SizedBox(height: 12),
+            // 서브 카피
+            Text(
+              "당신의 텅장을 지켜드립니다",
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: darkText.withOpacity(0.6),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class MyListScreen extends StatelessWidget {
+  final String type; // 'article' 또는 'post'
+  const MyListScreen({super.key, required this.type});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: brandYellow,
+      appBar: AppBar(backgroundColor: Colors.transparent, elevation: 0, title: Text(type == 'article' ? "내 심판 내역" : "내가 쓴 글")),
+      body: _buildWhiteContainer(
+        child: StreamBuilder<QuerySnapshot>(
+          stream: type == 'article'
+              ? Provider.of<ServiceProvider>(context).getMyArticlesStream()
+              : Provider.of<CommunityProvider>(context).getMyPostsStream(),
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
+            final docs = snapshot.data!.docs;
+            if (docs.isEmpty) return const Center(child: Text("기록이 없습니다."));
+
+            // ... 이전 생략
+            return ListView.builder(
+              padding: const EdgeInsets.all(24),
+              itemCount: docs.length,
+              itemBuilder: (context, index) {
+                // Firestore 문서를 Map으로 안전하게 변환
+                final data = docs[index].data() as Map<String, dynamic>;
+
+                // 데이터가 존재하지 않을 경우를 대비한 안전한 값 할당
+                final title = data.containsKey('title') ? data['title'] : '제목 없음';
+                final content = data.containsKey('content') ? data['content'] : '내용 없음';
+
+                return Card(
+                  margin: const EdgeInsets.only(bottom: 12),
+                  child: ListTile(
+                    title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+                    subtitle: Text(content, maxLines: 1, overflow: TextOverflow.ellipsis),
+                  ),
+                );
+              },
+            );
+          },
+        ),
+      ),
     );
   }
 }
