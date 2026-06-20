@@ -37,17 +37,17 @@
 ### 📸 실행 화면
 > **거지방의 소비 통제 문화를 당근마켓 UI로 풀어낸 거지방 앱의 주요 화면입니다.**
 
-| 🏠 수호 요청 목록 | 📝 수호 요청 글쓰기 | 💬 동네생활 |
+| 🏠 오늘의 심판대 | 📝 탕진 심판 신청 | 💬 수다방 |
 | :---: | :---: | :---: |
-| <img width="442" height="844" alt="Image" src="https://github.com/user-attachments/assets/cd7be386-bbd3-4e6e-b7ff-a331668d3128" /> | <img width="440" height="843" alt="Image" src="https://github.com/user-attachments/assets/73773c02-2ca9-4983-badc-834f42814d3b" /> | <img width="442" height="845" alt="Image" src="https://github.com/user-attachments/assets/db9a661d-f71a-436d-be9c-b6aeb03d9d95" /> |
+| <img width="510" height="906" alt="Image" src="https://github.com/user-attachments/assets/4c3d832f-4be5-40ea-a07b-9623b44ab58b" /> | <img width="510" height="906" alt="Image" src="https://github.com/user-attachments/assets/723fbf88-52f9-4ff6-88b6-b5c34b542135" /> | <img width="510" height="910" alt="Image" src="https://github.com/user-attachments/assets/bad36a48-5f32-4aaa-80ec-b98c43c19330" /> |
 | **메인 홈 (투표 리스트)** | **지출 허락 요청 작성** | **절약 커뮤니티 리스트** |
 
 <br>
 
-| 📄 동네생활 상세 | ✍️ 동네생활 글쓰기 | 👤 나의 수호 |
+| 📄 수다방 상세 | ✍️ 수다방 글쓰기 | 👤 소비기록 |
 | :---: | :---: | :---: |
-| <img width="442" height="848" alt="Image" src="https://github.com/user-attachments/assets/9380c1fd-fd90-4df3-ba7b-89319426b068" /> | <img width="441" height="840" alt="Image" src="https://github.com/user-attachments/assets/9195f97c-9706-4ff7-91b5-10b43bdc2d6b" /> | <img width="441" height="847" alt="Image" src="https://github.com/user-attachments/assets/f2abcc6d-5c6c-4edc-b6f7-4d23847893f8" /> |
-| **게시글 본문 및 공감** | **꿀팁/정보 공유 작성** | **마이페이지 (수호 온도)** |
+| <img width="507" height="907" alt="Image" src="https://github.com/user-attachments/assets/4a45ad17-795a-4f40-9a1d-5dec3f2fcb78" /> | <img width="509" height="911" alt="Image" src="https://github.com/user-attachments/assets/1879f1e0-0ac1-45fa-b0a2-8b8bf2fd30f9" /> | <img width="510" height="907" alt="Image" src="https://github.com/user-attachments/assets/755e6978-8b6e-4d37-a0a1-32ca2fe3ea58" /> |
+| **게시글 본문 및 공감** | **꿀팁/정보 공유 작성** | **마이페이지** |
 
 ---
 
